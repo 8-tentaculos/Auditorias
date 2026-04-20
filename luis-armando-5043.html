@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditoría Inteligente — Luis Armando</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#0a0c10;--sf:#10131a;--sf2:#161b25;
+  --br:rgba(255,255,255,0.07);--tx:#f0f2f7;--mu:#8892a4;
+  --ac:#00d4aa;--a2:#0098ff;--dn:#ff4b6e;--wn:#ffb400;
+  --fh:'Bricolage Grotesque',sans-serif;--fb:'DM Sans',sans-serif;--r:14px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--bg);color:var(--tx);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding:0 20px}
+
+.rv{opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}
+.rv.vis{opacity:1;transform:none}
+.d1{transition-delay:.07s}.d2{transition-delay:.14s}.d3{transition-delay:.21s}
+
+.hdr{background:var(--bg) !important;border-bottom:1px solid var(--br);position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:800px;height:500px;background:radial-gradient(ellipse,rgba(0,212,170,.06),transparent 65%);pointer-events:none}
+.hdr-in{position:relative;z-index:1;padding:44px 20px 40px;max-width:900px;margin:0 auto}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:10px}
+.logo{font-family:var(--fh);font-weight:800;font-size:.9rem;color:rgba(255,255,255,.4);letter-spacing:.04em}
+.logo span{color:var(--ac)}
+.hdr-date{font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)}
+.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.22);color:var(--ac);font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 13px;border-radius:40px;margin-bottom:18px}
+h1{font-family:var(--fh);font-weight:800;font-size:clamp(2rem,5vw,3.2rem);line-height:1.06;letter-spacing:-.03em;color:var(--tx);margin-bottom:8px}
+h1 em{font-style:normal;color:var(--ac)}
+.hdr-sub{font-size:.9rem;color:var(--mu);font-weight:300;margin-bottom:36px}
+.scores{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.sc{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);padding:14px 12px;text-align:center}
+.sc-l{font-size:.64rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-bottom:6px}
+.sc-v{font-family:var(--fh);font-weight:800;font-size:1.8rem;line-height:1}
+.cac{color:var(--ac)}.ca2{color:var(--a2)}.cdn{color:var(--dn)}.cwn{color:var(--wn)}
+
+.sec{padding:52px 0;border-bottom:1px solid var(--br)}
+.sec:last-child{border-bottom:none}
+.slbl{font-size:.66rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ac);margin-bottom:10px}
+h2{font-family:var(--fh);font-weight:800;font-size:clamp(1.35rem,3vw,1.9rem);letter-spacing:-.025em;line-height:1.18;color:var(--tx);margin-bottom:24px}
+p{color:var(--mu);margin-bottom:12px}
+p:last-child{margin-bottom:0}
+strong{color:var(--tx);font-weight:600}
+
+.ncg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.nc{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);padding:14px 16px}
+.nc-l{font-size:.63rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-bottom:4px}
+.nc-v{font-family:var(--fh);font-weight:700;font-size:.88rem;color:var(--tx);line-height:1.3}
+
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.cbox{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);padding:20px}
+.cbox-t{font-family:var(--fh);font-weight:700;font-size:.72rem;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
+.cwrap{position:relative;height:190px}
+
+.mt{width:100%;border-collapse:collapse;background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);overflow:hidden;margin-bottom:14px;font-size:.86rem}
+.mt th{background:var(--sf2) !important;font-family:var(--fh);font-weight:700;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;padding:11px 14px;text-align:left;color:var(--mu);border-bottom:1px solid var(--br)}
+.mt td{padding:11px 14px;border-bottom:1px solid var(--br);vertical-align:middle}
+.mt tr:last-child td{border-bottom:none}
+.tdl{color:var(--mu)}.tdc{font-weight:600;color:var(--tx)}.tdi{font-weight:700;color:var(--ac)}
+.mnote{background:rgba(0,212,170,.06) !important;border:1px solid rgba(0,212,170,.18);border-radius:var(--r);padding:14px 18px;font-size:.84rem;color:var(--ac)}
+
+.rbox{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);padding:24px;margin-bottom:18px;text-align:center}
+.rwrap{position:relative;height:280px;max-width:380px;margin:0 auto}
+
+.diag{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);overflow:hidden;margin-bottom:12px}
+.dh{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;background:var(--sf2) !important;border-bottom:1px solid var(--br)}
+.dt{font-family:var(--fh);font-weight:700;font-size:.9rem}
+.ds{font-family:var(--fh);font-weight:800;font-size:.78rem;padding:3px 11px;border-radius:20px}
+.dsr{background:rgba(255,75,110,.12);color:var(--dn)}
+.dsy{background:rgba(255,180,0,.12);color:var(--wn)}
+.dsg{background:rgba(0,212,170,.12);color:var(--ac)}
+.db{padding:16px}
+.di{display:flex;gap:9px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--br);font-size:.86rem}
+.di:last-child{border-bottom:none;padding-bottom:0}
+.dii{flex-shrink:0;margin-top:2px}
+.dit{color:var(--mu);line-height:1.55}
+.dit strong{color:var(--tx)}
+
+.grow{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+.gb{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);padding:16px 12px;text-align:center}
+.gwrap{position:relative;height:100px;width:100px;margin:0 auto 8px}
+.gl{font-family:var(--fh);font-weight:700;font-size:.8rem;color:var(--tx);margin-bottom:3px}
+.gs{font-size:.7rem;color:var(--mu);line-height:1.4}
+
+.prob{display:flex;gap:14px;align-items:flex-start;background:var(--sf) !important;border:1px solid var(--br);border-left:3px solid var(--dn);border-radius:var(--r);padding:16px 18px;margin-bottom:10px}
+.pn{font-family:var(--fh);font-weight:800;font-size:1.4rem;color:var(--dn);line-height:1;flex-shrink:0;width:28px}
+.prob h4{font-family:var(--fh);font-weight:700;font-size:.88rem;margin-bottom:3px}
+.prob p{font-size:.83rem;margin:0}
+
+.sis{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);overflow:hidden;margin-bottom:10px}
+.sh{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;background:var(--sf2) !important;border-bottom:1px solid var(--br);flex-wrap:wrap;gap:7px}
+.sh h3{font-family:var(--fh);font-weight:700;font-size:.9rem;margin:0}
+.sa{font-size:.63rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:rgba(0,212,170,.1);color:var(--ac);padding:3px 11px;border-radius:20px;flex-shrink:0}
+.sb{padding:14px 18px;display:flex;flex-direction:column;gap:8px}
+.sr{display:flex;gap:9px;font-size:.84rem}
+.srl{font-weight:600;color:var(--tx);min-width:78px;flex-shrink:0;font-size:.76rem}
+.srv{color:var(--mu);line-height:1.5}
+
+.prio{display:flex;gap:12px;align-items:flex-start;background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);padding:14px 16px;margin-bottom:9px}
+.pdot{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.pdr{background:var(--dn)}.pdy{background:var(--wn)}.pdg{background:var(--mu)}
+.prio h4{font-family:var(--fh);font-weight:700;font-size:.86rem;margin-bottom:2px}
+.prio p{font-size:.82rem;margin:0}
+
+.conc{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);padding:26px;position:relative;overflow:hidden;margin-bottom:20px}
+.conc::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,170,.07),transparent 70%)}
+.conc p{font-size:.9rem;color:var(--mu);position:relative;z-index:1}
+
+.stab{width:100%;border-collapse:collapse;background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);overflow:hidden;font-size:.86rem}
+.stab th{background:var(--sf2) !important;font-family:var(--fh);font-size:.64rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:10px 14px;text-align:left;color:var(--mu);border-bottom:1px solid var(--br)}
+.stab td{padding:12px 14px;border-bottom:1px solid var(--br);vertical-align:middle}
+.stab tr:last-child td{border-bottom:none}
+.sbw{display:flex;align-items:center;gap:9px}
+.sbar{flex:1;height:6px;background:var(--sf2);border-radius:3px;overflow:hidden}
+.sfill{height:100%;border-radius:3px;width:0;transition:width 1.3s ease}
+.sfr{background:var(--dn)}.sfy{background:var(--wn)}.sfg{background:var(--ac)}
+.snum{font-family:var(--fh);font-weight:800;font-size:.86rem;min-width:32px}
+
+.btn-wa{display:inline-flex;align-items:center;gap:9px;background:var(--ac);color:#0a0c10;font-family:var(--fh);font-weight:700;font-size:.9rem;padding:13px 28px;border-radius:50px;text-decoration:none;transition:transform .2s,box-shadow .2s}
+.btn-wa:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,212,170,.35)}
+
+.btn-share{display:inline-flex;align-items:center;gap:9px;background:transparent;color:var(--ac);border:1px solid rgba(0,212,170,.35);font-family:var(--fh);font-weight:700;font-size:.86rem;padding:11px 24px;border-radius:50px;text-decoration:none;transition:transform .2s,background .2s,box-shadow .2s;margin-top:12px}
+.btn-share:hover{background:rgba(0,212,170,.08);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,212,170,.15)}
+
+.share-box{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);padding:22px 24px;text-align:center;margin-top:24px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.share-box p{font-size:.82rem;color:var(--mu);margin:0 0 12px}
+
+.cta-mid{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);padding:28px;text-align:center;margin-top:24px}
+.cta-mid h3{font-family:var(--fh);font-weight:800;font-size:1.1rem;color:var(--tx);margin-bottom:8px}
+.cta-mid p{font-size:.86rem;color:var(--mu);margin-bottom:20px}
+
+.ftr{background:var(--sf) !important;border-top:1px solid var(--br);padding:40px 20px;text-align:center}
+.ftr h3{font-family:var(--fh);font-weight:800;font-size:1.2rem;color:var(--tx);margin-bottom:10px}
+.ftr p{font-size:.82rem;color:var(--mu);margin-bottom:24px}
+
+@media(max-width:640px){
+  .scores{grid-template-columns:1fr 1fr}
+  .charts-row{grid-template-columns:1fr}
+  .grow{grid-template-columns:1fr 1fr}
+  .ncg{grid-template-columns:1fr 1fr}
+  h1{font-size:1.9rem}
+  .rwrap{height:220px}
+}
+@media(max-width:400px){
+  .grow{grid-template-columns:1fr}
+  .ncg{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-in">
+    <div class="hdr-top">
+      <span class="logo">8 <span>Tentáculos</span></span>
+      <span class="hdr-date">Auditoría Inteligente · Julio 2025</span>
+    </div>
+    <div class="badge rv vis">📊 Informe de diagnóstico</div>
+    <h1 class="rv vis d1">Luis <em>Armando</em></h1>
+    <p class="hdr-sub rv vis d2">Concesionario / Venta de coches · Pase de exposición · Equipo de 1 persona</p>
+    <div class="scores rv vis d3">
+      <div class="sc"><div class="sc-l">Captación</div><div class="sc-v cwn">5/10</div></div>
+      <div class="sc"><div class="sc-l">Conversión</div><div class="sc-v cwn">4/10</div></div>
+      <div class="sc"><div class="sc-l">Operaciones</div><div class="sc-v cdn">3/10</div></div>
+      <div class="sc"><div class="sc-l">Fugas críticas</div><div class="sc-v cdn">4</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 01 RESUMEN -->
+<section class="sec">
+  <div class="wrap">
+    <p class="slbl rv">01 — Resumen del negocio</p>
+    <h2 class="rv d1">Quiénes son y en qué momento están</h2>
+    <div class="ncg rv d2">
+      <div class="nc"><div class="nc-l">Sector</div><div class="nc-v">Venta de coches</div></div>
+      <div class="nc"><div class="nc-l">Fase</div><div class="nc-v">Solo pase exposición, sin publicidad digital</div></div>
+      <div class="nc"><div class="nc-l">Equipo</div><div class="nc-v">1 persona</div></div>
+      <div class="nc"><div class="nc-l">Ticket medio</div><div class="nc-v">10.000 €</div></div>
+      <div class="nc"><div class="nc-l">Modelo</div><div class="nc-v">Venta directa presencial</div></div>
+      <div class="nc"><div class="nc-l">Canal principal</div><div class="nc-v">Pase de exposición</div></div>
+    </div>
+    <p class="rv d3">Luis Armando vende coches con un ticket medio de <strong>10.000 €</strong> apoyándose únicamente en el tráfico presencial de su exposición — sin publicidad digital ni generación activa de demanda. Con <strong>25 leads mensuales y 13 ventas</strong>, su tasa de conversión del 52% es notablemente alta para el sector, lo que indica una buena capacidad de cierre presencial. El potencial del negocio es sólido, pero está totalmente limitado por la ausencia de sistemas digitales que amplíen el alcance y automaticen el seguimiento: cualquier persona que no entre físicamente al local, simplemente no existe para el negocio.</p>
+  </div>
+</section>
+
+<!-- 02 MÉTRICAS -->
+<section class="sec">
+  <div class="wrap">
+    <p class="slbl rv">02 — Métricas del embudo</p>
+    <h2 class="rv d1">Dónde está el dinero ahora y dónde podría estar</h2>
+    <div class="charts-row rv d2">
+      <div class="cbox">
+        <div class="cbox-t">Embudo actual — leads vs resultados</div>
+        <div class="cwrap"><canvas id="cFunnel"></canvas></div>
+      </div>
+      <div class="cbox">
+        <div class="cbox-t">Facturación nueva mensual — actual vs con sistemas</div>
+        <div class="cwrap"><canvas id="cRevenue"></canvas></div>
+      </div>
+    </div>
+    <table class="mt rv d3">
+      <thead><tr><th>Métrica</th><th>Situación actual</th><th>Con sistemas inteligentes</th></tr></thead>
+      <tbody>
+        <tr><td class="tdl">Inversión mensual captación</td><td class="tdc">200 €</td><td class="tdi">200 € (misma inversión)</td></tr>
+        <tr><td class="tdl">Leads mensuales</td><td class="tdc">~25</td><td class="tdi">↑ ~45 (canal digital activo)</td></tr>
+        <tr><td class="tdl">Ventas mensuales nuevas</td><td class="tdc">~13 clientes</td><td class="tdi">↑ ~22 clientes</td></tr>
+        <tr><td class="tdl">Coste por lead</td><td class="tdc">8 €</td><td class="tdi">↓ ~4,4 € (más leads, misma inversión)</td></tr>
+        <tr><td class="tdl">Coste por venta</td><td class="tdc">15,38 €</td><td class="tdi">↓ ~9,09 €</td></tr>
+        <tr><td class="tdl">Tasa conversión lead→venta</td><td class="tdc">52%</td><td class="tdi">↑ ~55-60% (seguimiento activo)</td></tr>
+        <tr><td class="tdl">Facturación nuevos clientes/mes</td><td class="tdc">~130.000 €</td><td class="tdi">↑ ~220.000 €</td></tr>
+      </tbody>
+    </table>
+    <div class="mnote rv d4">💡 <strong>El impacto real:</strong> Con un sistema de captación digital y citas automáticas, Luis Armando podría pasar de 13 a ~22 ventas mensuales sin aumentar su inversión, sumando aproximadamente <strong>90.000 € adicionales en facturación mensual</strong> con el mismo esfuerzo comercial.</div>
+  </div>
+</section>
+
+<!-- 03 DIAGNÓSTICO -->
+<section class="sec">
+  <div class="wrap">
+    <p class="slbl rv">03 — Diagnóstico por áreas</p>
+    <h2 class="rv d1">Qué funciona, qué falla y dónde se escapa el dinero</h2>
+    <div class="rbox rv d2">
+      <div class="cbox-t">Mapa de salud del negocio — actual vs con sistemas 8T (puntuación /10)</div>
+      <div class="rwrap"><canvas id="cRadar"></canvas></div>
+    </div>
+
+    <div class="diag rv d1">
+      <div class="dh"><span class="dt">📣 Captación</span><span class="ds dsy">5 / 10</span></div>
+      <div class="db">
+        <div class="di"><span class="dii">✅</span><span class="dit"><strong>Conversión presencial alta:</strong> con un 52% de cierre sobre los leads que entran a exposición, la capacidad de venta es muy buena.</span></div>
+        <div class="di"><span class="dii">❌</span><span class="dit"><strong>Sin publicidad digital activa:</strong> el negocio depende 100% del tráfico presencial espontáneo. Si nadie pasa, no hay leads.</span></div>
+        <div class="di"><span class="dii">❌</span><span class="dit"><strong>Sin canal de captación online:</strong> no hay web con formularios, redes sociales activas ni anuncios que traigan compradores interesados fuera del horario de exposición.</span></div>
+        <div class="di"><span class="dii">🔴</span><span class="dit"><strong>Fuga crítica — dependencia total del tráfico físico:</strong> en días de baja afluencia, el negocio no genera ningún lead. Un canal digital multiplicaría los contactos sin cambiar la estructura actual.</span></div>
+      </div>
+    </div>
+
+    <div class="diag rv d2">
+      <div class="dh"><span class="dt">🔁 Conversión y seguimiento</span><span class="ds dsy">4 / 10</span></div>
+      <div class="db">
+        <div class="di"><span class="dii">✅</span><span class="dit"><strong>Alta tasa de cierre presencial:</strong> los clientes que llegan y hablan con Luis Armando tienen muchas probabilidades de comprar.</span></div>
+        <div class="di"><span class="dii">❌</span><span class="dit"><strong>Respuesta pasiva (4 horas):</strong> se espera a que el cliente llame. En venta de coches, la velocidad de respuesta es crítica; un retraso de 4 horas puede costar la venta.</span></div>
+        <div class="di"><span class="dii">❌</span><span class="dit"><strong>Sin CRM ni pipeline:</strong> no hay registro de qué leads están en proceso, en qué etapa están ni cuándo hacer seguimiento, todo depende de la memoria.</span></div>
+        <div class="di"><span class="dii">🔴</span><span class="dit"><strong>Fuga crítica — sin seguimiento post-visita:</strong> si alguien visita la exposición y no compra ese día, no se le vuelve a contactar. Se pierde toda oportunidad de recuperar esa venta.</span></div>
+        <div class="di"><span class="dii">🔴</span><span class="dit"><strong>Fuga crítica — alertas manuales:</strong> el control de estado de cada cliente (interesado, negociando, pendiente de financiación) se gestiona manualmente, con riesgo permanente de olvido.</span></div>
+      </div>
+    </div>
+
+    <div class="diag rv d3">
+      <div class="dh"><span class="dt">⚙️ Operaciones internas</span><span class="ds dsr">3 / 10</span></div>
+      <div class="db">
+        <div class="di"><span class="dii">✅</span><span class="dit"><strong>Gestor contable externo:</strong> la facturación está delegada en un gestor, lo que libera algo de carga administrativa.</span></div>
+        <div class="di"><span class="dii">❌</span><span class="dit"><strong>Todos los procesos son manuales:</strong> sin automatización de ningún tipo, Luis Armando dedica tiempo a tareas que podrían ejecutarse solas.</span></div>
+        <div class="di"><span class="dii">❌</span><span class="dit"><strong>Errores en preparación del vehículo:</strong> los fallos en la entrega del artículo generan incidencias, reclamaciones y daño a la reputación del negocio.</span></div>
+        <div class="di"><span class="dii">🔴</span><span class="dit"><strong>Fuga crítica — gestión de garantías:</strong> las garantías se identifican como algo que Luis Armando querría eliminar o simplificar, lo que puede generar fricción legal y distanciamiento de clientes. Un sistema de onboarding y entrega automatizado reduciría errores y reclamaciones.</span></div>
+      </div>
+    </div>
+
+    <div class="share-box rv d3">
+      <p>¿Conoces a alguien que necesite saber cómo está su negocio?</p>
+      <a href="https://wa.me/?text=Realiza%20auditoria%20de%20tu%20negocio%20con%20ia%20avanzada%20aqu%C3%AD%20gratis%3A%20https%3A%2F%2F8tentaculos.com%2Fauditoria-inteligente-a" class="btn-share" target="_blank" rel="noopener">📤 Envía a un amigo su auditoría gratis</a>
+    </div>
+  </div>
+</section>
+
+<!-- 04 PROBLEMAS -->
+<section class="sec">
+  <div class="wrap">
+    <p class="slbl rv">04 — Problemas principales</p>
+    <h2 class="rv d1">Los 5 frenos ordenados por impacto económico</h2>
+    <div class="cbox rv d2" style="margin-bottom:18px">
+      <div class="cbox-t">Ventas perdidas al mes por cada problema estimado</div>
+      <div class="cwrap"><canvas id="cProblems"></canvas></div>
+    </div>
+    <div class="prob rv d1"><span class="pn">01</span><div><h4>Cero captación digital — el embudo empieza y acaba en la exposición</h4><p>Sin publicidad en internet ni canal activo, el volumen de leads está totalmente limitado por el tráfico físico. Se estima que se están dejando de captar entre 15 y 25 leads mensuales adicionales que podrían convertirse en 7-12 ventas más al mes.</p></div></div>
+    <div class="prob rv d2"><span class="pn">02</span><div><h4>Sin seguimiento post-visita — el interesado que no compra hoy, se pierde para siempre</h4><p>No existe ningún proceso para contactar a quien visitó la exposición y no cerró. En venta de coches, muchos clientes necesitan varios días para decidir. Sin seguimiento, esas ventas van a la competencia.</p></div></div>
+    <div class="prob rv d3"><span class="pn">03</span><div><h4>Respuesta reactiva de 4 horas — el cliente no espera</h4><p>Esperar a que el cliente llame y responder 4 horas después es letal en un sector donde hay múltiples opciones. Cada hora sin respuesta reduce la probabilidad de cierre hasta un 40%.</p></div></div>
+    <div class="prob rv d1"><span class="pn">04</span><div><h4>Sin CRM — la gestión vive en la cabeza</h4><p>Sin un pipeline o CRM, no hay visibilidad de qué clientes están en qué fase. Esto genera olvidos, seguimientos perdidos y ventas que se enfrían sin saberlo.</p></div></div>
+    <div class="prob rv d2"><span class="pn">05</span><div><h4>Errores en preparación y entrega del vehículo — genera garantías y reclamaciones</h4><p>Los fallos en la preparación del artículo generan incidencias post-venta que consumen tiempo, dinero y reputación. Un proceso de entrega estandarizado y automatizado elimina esta fricción.</p></div></div>
+
+    <div class="cta-mid rv d3">
+      <h3>¿Quieres instalar estos sistemas en tu negocio?</h3>
+      <p>Agenda una sesión 1 a 1 con el equipo y te explicamos exactamente cómo hacerlo, qué necesitas y en cuánto tiempo verías resultados.</p>
+      <a href="https://wa.me/34649085339?text=Agendar%20sesion%201%20a%201" class="btn-wa" target="_blank" rel="noopener">💬 Agendar sesión 1 a 1</a>
+    </div>
+  </div>
+</section>
+
+<!-- 05 SISTEMAS -->
+<section class="sec">
+  <div class="wrap">
+    <p class="slbl rv">05 — Sistemas recomendados</p>
+    <h2 class="rv d1">Qué instalar y qué impacto esperar</h2>
+    <div class="grow rv d2">
+      <div class="gb"><div class="gwrap"><canvas id="g1"></canvas></div><div class="gl">Leads sin canal digital</div><div class="gs">~55% del potencial desaprovechado por falta de captación online</div></div>
+      <div class="gb"><div class="gwrap"><canvas id="g2"></canvas></div><div class="gl">Conversión sin seguimiento</div><div class="gs">~40% de leads calientes se pierden por falta de contacto post-visita</div></div>
+      <div class="gb"><div class="gwrap"><canvas id="g3"></canvas></div><div class="gl">Eficiencia operativa</div><div class="gs">~25% — todos los procesos son manuales, sin ninguna automatización</div></div>
+    </div>
+
+    <div class="sis rv d1">
+      <div class="sh"><h3>Sistema de citas automáticas</h3><span class="sa">Captación</span></div>
+      <div class="sb">
+        <div class="sr"><span class="srl">Por qué:</span><span class="srv">Luis Armando no tiene ningún canal para que un interesado reserve una visita a la exposición fuera del horario espontáneo. Todo el proceso es pasivo.</span></div>
+        <div class="sr"><span class="srl">Qué resuelve:</span><span class="srv">Permite que clientes potenciales de internet pidan cita para ver un coche automáticamente, sin que Luis Armando tenga que intervenir ni estar al teléfono.</span></div>
+        <div class="sr"><span class="srl">Impacto:</span><span class="srv">Estimación de +15-20 leads/mes adicionales que se convierten en visitas agendadas, potencialmente +7-9 ventas más al mes.</span></div>
+      </div>
+    </div>
+
+    <div class="sis rv d2">
+      <div class="sh"><h3>Pipeline automatizado</h3><span class="sa">Conversión y seguimiento</span></div>
+      <div class="sb">
+        <div class="sr"><span class="srl">Por qué:</span><span class="srv">Sin CRM, no hay visibilidad de en qué fase está cada cliente. Los seguimientos dependen de la memoria y los leads calientes se enfrían.</span></div>
+        <div class="sr"><span class="srl">Qué resuelve:</span><span class="srv">Organiza automáticamente todos los contactos en etapas (interesado, visitó, negociando, cerrado), recordando cuándo actuar con cada uno.</span></div>
+        <div class="sr"><span class="srl">Impacto:</span><span class="srv">Recuperar entre un 20-30% de los leads que actualmente se pierden por falta de seguimiento. Con 25 leads al mes, eso puede ser 2-4 ventas adicionales.</span></div>
+      </div>
+    </div>
+
+    <div class="sis rv d3">
+      <div class="sh"><h3>Sistema de alertas</h3><span class="sa">Conversión y seguimiento</span></div>
+      <div class="sb">
+        <div class="sr"><span class="srl">Por qué:</span><span class="srv">Las alertas se gestionan manualmente, lo que significa que se olvidan. En un negocio unipersonal esto es especialmente crítico.</span></div>
+        <div class="sr"><span class="srl">Qué resuelve:</span><span class="srv">Notifica automáticamente cuándo contactar a un cliente, cuándo caduca una reserva, cuándo un lead lleva más de X días sin respuesta o cuándo preparar un vehículo para entrega.</span></div>
+        <div class="sr"><span class="srl">Impacto:</span><span class="srv">Elimina olvidos y reduce los errores en preparación del vehículo. Estimación de ahorro de 5-8 horas semanales en seguimiento manual.</span></div>
+      </div>
+    </div>
+
+    <div class="sis rv d1">
+      <div class="sh"><h3>Sistema de atención al cliente por WhatsApp</h3><span class="sa">Conversión y seguimiento</span></div>
+      <div class="sb">
+        <div class="sr"><span class="srl">Por qué:</span><span class="srv">La respuesta tarda 4 horas porque Luis Armando espera a que le llamen. WhatsApp permite responder de forma automática e inmediata a cualquier consulta.</span></div>
+        <div class="sr"><span class="srl">Qué resuelve:</span><span class="srv">Responde automáticamente a interesados en segundos: precio de un coche, disponibilidad, cómo visitarlo o pedir financiación, sin intervención manual.</span></div>
+        <div class="sr"><span class="srl">Impacto:</span><span class="srv">Reducir el tiempo de respuesta de 4 horas a menos de 1 minuto puede incrementar la tasa de conversión de esos leads en un 25-35%.</span></div>
+      </div>
+    </div>
+
+    <div class="sis rv d2">
+      <div class="sh"><h3>Sistema de onboarding y entrega grupal con IA</h3><span class="sa">Operaciones internas</span></div>
+      <div class="sb">
+        <div class="sr"><span class="srl">Por qué:</span><span class="srv">Los errores en la preparación del vehículo generan reclamaciones, garantías y tiempo perdido en resolución de incidencias post-venta.</span></div>
+        <div class="sr"><span class="srl">Qué resuelve:</span><span class="srv">Estandariza y automatiza el proceso de preparación y entrega del vehículo con checklists automáticos, documentación al cliente y registro de cada entrega.</span></div>
+        <div class="sr"><span class="srl">Impacto:</span><span class="srv">Reducción de errores en preparación estimada en un 80%, menor fricción post-venta y menos tiempo dedicado a gestión de garantías y reclamaciones.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 PRIORIDAD -->
+<section class="sec">
+  <div class="wrap">
+    <p class="slbl rv">06 — Orden de implementación</p>
+    <h2 class="rv d1">Qué instalar primero y por qué</h2>
+    <div class="prio rv d1"><div class="pdot pdr"></div><div><h4>Ahora — Sistema de atención al cliente por WhatsApp</h4><p>Es el cambio de mayor impacto inmediato: pasar de respuesta pasiva de 4 horas a respuesta automática en segundos. Sobre los 25 leads actuales ya genera más ventas sin cambiar nada más.</p></div></div>
+    <div class="prio rv d2"><div class="pdot pdr"></div><div><h4>Ahora — Pipeline automatizado + Sistema de alertas</h4><p>Organizar los leads actuales en un pipeline y activar alertas automáticas recupera ventas que ya se están perdiendo hoy. Es el complemento inmediato a WhatsApp para no perder ningún contacto.</p></div></div>
+    <div class="prio rv d3"><div class="pdot pdy"></div><div><h4>Mes 2 — Sistema de citas automáticas</h4><p>Una vez el seguimiento esté funcionando, activar un canal digital con citas automáticas multiplica el volumen de leads sin aumentar la inversión. Preparar el embudo antes de abrir el grifo.</p></div></div>
+    <div class="prio rv d1"><div class="pdot pdg"></div><div><h4>Mes 3 — Sistema de onboarding y entrega con IA</h4><p>Con más volumen de ventas, estandarizar la entrega del vehículo se vuelve imprescindible para escalar sin incrementar errores ni reclamaciones. Elimina la fricción de garantías.</p></div></div>
+  </div>
+</section>
+
+<!-- 07 CONCLUSIÓN -->
+<section class="sec">
+  <div class="wrap">
+    <p class="slbl rv">07 — Conclusión estratégica</p>
+    <h2 class="rv d1">El diagnóstico en claro</h2>
+    <div class="conc rv d2">
+      <p>Luis Armando tiene un negocio con una <strong>capacidad de cierre presencial excelente (52% de conversión)</strong>, lo que demuestra que sabe vender. El problema no es la venta — es que el embudo empieza demasiado tarde: solo existe desde que alguien entra físicamente al local. Todo lo que ocurre antes de esa visita está completamente fuera de su control.</p>
+      <p style="margin-top:12px">Instalando primero el sistema de respuesta por WhatsApp y el pipeline, puede empezar a ver resultados en las primeras 2-3 semanas recuperando ventas que ya hoy se escapan. En 60-90 días, con captación digital activa y citas automáticas, el objetivo de <strong>pasar de 13 a 20+ ventas mensuales sin aumentar inversión</strong> es completamente realista.</p>
+    </div>
+    <table class="stab rv d3">
+      <thead><tr><th>Área</th><th>Puntuación actual</th><th>Diagnóstico</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Captación</strong></td>
+          <td><div class="sbw"><div class="sbar"><div class="sfill sfy" data-w="50%"></div></div><span class="snum cwn">5/10</span></div></td>
+          <td style="color:var(--mu);font-size:.8rem">Buena conversión presencial pero cero canal digital activo. El volumen de leads está limitado por el tráfico físico.</td>
+        </tr>
+        <tr>
+          <td><strong>Conversión</strong></td>
+          <td><div class="sbw"><div class="sbar"><div class="sfill sfy" data-w="40%"></div></div><span class="snum cwn">4/10</span></div></td>
+          <td style="color:var(--mu);font-size:.8rem">Sin CRM, sin seguimiento post-visita y con respuesta reactiva de 4h. Se pierde entre un 20-30% de leads recuperables.</td>
+        </tr>
+        <tr>
+          <td><strong>Operaciones</strong></td>
+          <td><div class="sbw"><div class="sbar"><div class="sfill sfr" data-w="30%"></div></div><span class="snum cdn">3/10</span></div></td>
+          <td style="color:var(--mu);font-size:.8rem">100% manual. Errores en preparación de vehículos, gestión de garantías sin sistema y contabilidad delegada sin integración.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<div class="ftr">
+  <h3>¿Listo para convertir tu negocio en un negocio inteligente?</h3>
+  <p>Agenda una sesión 1 a 1 con el equipo y te contamos exactamente cómo instalamos los sistemas, qué necesitas y en cuánto tiempo verías resultados.</p>
+  <a href="https://wa.me/34649085339?text=Agendar%20sesion%201%20a%201" class="btn-wa" target="_blank" rel="noopener">💬 Agendar sesión 1 a 1</a>
+  <p style="margin-top:20px;font-size:.72rem">© 2025 Neurosense S.L. · 8tentaculos.com · Auditoría Inteligente</p>
+</div>
+
+<script>
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')}),{threshold:.08});
+document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+
+const sbObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('.sfill').forEach(b=>{setTimeout(()=>{b.style.width=b.getAttribute('data-w')},200)});sbObs.unobserve(e.target)}})},{threshold:.3});
+const st=document.querySelector('.stab');if(st)sbObs.observe(st);
+
+Chart.defaults.color='#8892a4';
+Chart.defaults.font.family="'DM Sans',sans-serif";
+const A='#00d4aa',A2='#0098ff',D='#ff4b6e',W='#ffb400',S2='#161b25',BR='rgba(255,255,255,0.07)';
+
+new Chart(document.getElementById('cFunnel'),{
+  type:'bar',
+  data:{
+    labels:['Leads/mes','Consultan precio','Visitan expo','Cierran venta'],
+    datasets:[{
+      data:[25,20,16,13],
+      backgroundColor:['rgba(0,152,255,.4)','rgba(0,152,255,.3)','rgba(255,180,0,.4)','rgba(255,75,110,.5)'],
+      borderColor:[A2,A2,W,D],borderWidth:1,borderRadius:6
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{grid:{color:BR},ticks:{font:{size:11}}},y:{grid:{color:BR},beginAtZero:true}}}
+});
+
+new Chart(document.getElementById('cRevenue'),{
+  type:'bar',
+  data:{
+    labels:['Actual','Con sistemas'],
+    datasets:[{
+      data:[130000,220000],
+      backgroundColor:['rgba(255,75,110,.35)','rgba(0,212,170,.4)'],
+      borderColor:[D,A],borderWidth:1,borderRadius:8
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{grid:{color:BR}},y:{grid:{color:BR},beginAtZero:true,ticks:{callback:v=>v.toLocaleString('es-ES')+'€'}}}}
+});
+
+new Chart(document.getElementById('cRadar'),{
+  type:'radar',
+  data:{
+    labels:['Captación','Respuesta leads','Seguimiento','CRM/Pipeline','Operaciones','Métricas'],
+    datasets:[
+      {label:'Situación actual',data:[5,2,2,1,3,2],
+       backgroundColor:'rgba(255,75,110,.1)',borderColor:D,borderWidth:2,pointBackgroundColor:D,pointRadius:4},
+      {label:'Con sistemas 8T',data:[8,9,8,8,7,8],
+       backgroundColor:'rgba(0,212,170,.08)',borderColor:A,borderWidth:2,pointBackgroundColor:A,pointRadius:4}
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{boxWidth:11,padding:14,font:{size:11}}}},
+    scales:{r:{min:0,max:10,grid:{color:BR},angleLines:{color:BR},
+      pointLabels:{font:{size:11},color:'#8892a4'},ticks:{display:false}}}}
+});
+
+new Chart(document.getElementById('cProblems'),{
+  type:'bar',
+  data:{
+    labels:['Sin canal digital','Sin seguimiento','Respuesta lenta','Sin CRM','Errores entrega'],
+    datasets:[{
+      data:[9,4,3,3,2],
+      backgroundColor:['rgba(255,75,110,.55)','rgba(255,75,110,.45)','rgba(255,180,0,.5)','rgba(255,180,0,.4)','rgba(136,146,164,.3)'],
+      borderColor:[D,D,W,W,'#8892a4'],borderWidth:1,borderRadius:6
+    }]
+  },
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' ~'+ctx.raw+' ventas perdidas/mes'}}},
+    scales:{x:{grid:{color:BR},beginAtZero:true,title:{display:true,text:'ventas perdidas/mes',color:'#8892a4',font:{size:11}}},y:{grid:{color:BR},ticks:{font:{size:11}}}}}
+});
+
+function gauge(id,val,max,color){
+  new Chart(document.getElementById(id),{
+    type:'doughnut',
+    data:{datasets:[{data:[val,max-val],backgroundColor:[color,S2],borderWidth:0,borderRadius:3}]},
+    plugins:[{id:'ct',beforeDraw(c){
+      const{ctx,chartArea:{top,bottom,left,right}}=c;
+      const cx=(left+right)/2,cy=(top+bottom)/2;
+      ctx.save();ctx.font="800 15px 'Bricolage Grotesque',sans-serif";
+      ctx.fillStyle='#f0f2f7';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(Math.round((val/max)*100)+'%',cx,cy);ctx.restore();
+    }}],
+    options:{responsive:true,maintainAspectRatio:false,cutout:'70%',
+      plugins:{legend:{display:false},tooltip:{enabled:false}}}
+  });
+}
+gauge('g1',4.5,10,D);
+gauge('g2',6,10,W);
+gauge('g3',2.5,10,A2);
+</script>
+</body>
+</html>
