@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditoría Inteligente — Joshua</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#0a0c10;--sf:#10131a;--sf2:#161b25;
+  --br:rgba(255,255,255,0.07);--tx:#f0f2f7;--mu:#8892a4;
+  --ac:#00d4aa;--a2:#0098ff;--dn:#ff4b6e;--wn:#ffb400;
+  --fh:'Bricolage Grotesque',sans-serif;--fb:'DM Sans',sans-serif;--r:14px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--bg);color:var(--tx);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding:0 20px}
+
+.rv{opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}
+.rv.vis{opacity:1;transform:none}
+.d1{transition-delay:.07s}.d2{transition-delay:.14s}.d3{transition-delay:.21s}
+
+.hdr{background:var(--bg) !important;border-bottom:1px solid var(--br);position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:800px;height:500px;background:radial-gradient(ellipse,rgba(0,212,170,.06),transparent 65%);pointer-events:none}
+.hdr-in{position:relative;z-index:1;padding:44px 20px 40px;max-width:900px;margin:0 auto}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:10px}
+.logo{font-family:var(--fh);font-weight:800;font-size:.9rem;color:rgba(255,255,255,.4);letter-spacing:.04em}
+.logo span{color:var(--ac)}
+.hdr-date{font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)}
+.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.22);color:var(--ac);font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 13px;border-radius:40px;margin-bottom:18px}
+h1{font-family:var(--fh);font-weight:800;font-size:clamp(2rem,5vw,3.2rem);line-height:1.06;letter-spacing:-.03em;color:var(--tx);margin-bottom:8px}
+h1 em{font-style:normal;color:var(--ac)}
+.hdr-sub{font-size:.9rem;color:var(--mu);font-weight:300;margin-bottom:36px}
+.scores{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.sc{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);padding:14px 12px;text-align:center}
+.sc-l{font-size:.64rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-bottom:6px}
+.sc-v{font-family:var(--fh);font-weight:800;font-size:1.8rem;line-height:1}
+.cac{color:var(--ac)}.ca2{color:var(--a2)}.cdn{color:var(--dn)}.cwn{color:var(--wn)}
+
+.sec{padding:52px 0;border-bottom:1px solid var(--br)}
+.sec:last-child{border-bottom:none}
+.slbl{font-size:.66rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ac);margin-bottom:10px}
+h2{font-family:var(--fh);font-weight:800;font-size:clamp(1.35rem,3vw,1.9rem);letter-spacing:-.025em;line-height:1.18;color:var(--tx);margin-bottom:24px}
+p{color:var(--mu);margin-bottom:12px}
+p:last-child{margin-bottom:0}
+strong{color:var(--tx);font-weight:600}
+
+.ncg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.nc{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);padding:14px 16px}
+.nc-l{font-size:.63rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-bottom:4px}
+.nc-v{font-family:var(--fh);font-weight:700;font-size:.88rem;color:var(--tx);line-height:1.3}
+
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.cbox{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);padding:20px}
+.cbox-t{font-family:var(--fh);font-weight:700;font-size:.72rem;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
+.cwrap{position:relative;height:190px}
+
+.mt{width:100%;border-collapse:collapse;background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);overflow:hidden;margin-bottom:14px;font-size:.86rem}
+.mt th{background:var(--sf2) !important;font-family:var(--fh);font-weight:700;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;padding:11px 14px;text-align:left;color:var(--mu);border-bottom:1px solid var(--br)}
+.mt td{padding:11px 14px;border-bottom:1px solid var(--br);vertical-align:middle}
+.mt tr:last-child td{border-bottom:none}
+.tdl{color:var(--mu)}.tdc{font-weight:600;color:var(--tx)}.tdi{font-weight:700;color:var(--ac)}
+.mnote{background:rgba(0,212,170,.06) !important;border:1px solid rgba(0,212,170,.18);border-radius:var(--r);padding:14px 18px;font-size:.84rem;color:var(--ac)}
+
+.rbox{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);padding:24px;margin-bottom:18px;text-align:center}
+.rwrap{position:relative;height:280px;max-width:380px;margin:0 auto}
+
+.diag{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);overflow:hidden;margin-bottom:12px}
+.dh{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;background:var(--sf2) !important;border-bottom:1px solid var(--br)}
+.dt{font-family:var(--fh);font-weight:700;font-size:.9rem}
+.ds{font-family:var(--fh);font-weight:800;font-size:.78rem;padding:3px 11px;border-radius:20px}
+.dsr{background:rgba(255,75,110,.12);color:var(--dn)}
+.dsy{background:rgba(255,180,0,.12);color:var(--wn)}
+.dsg{background:rgba(0,212,170,.12);color:var(--ac)}
+.db{padding:16px}
+.di{display:flex;gap:9px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--br);font-size:.86rem}
+.di:last-child{border-bottom:none;padding-bottom:0}
+.dii{flex-shrink:0;margin-top:2px}
+.dit{color:var(--mu);line-height:1.55}
+.dit strong{color:var(--tx)}
+
+.grow{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+.gb{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);padding:16px 12px;text-align:center}
+.gwrap{position:relative;height:100px;width:100px;margin:0 auto 8px}
+.gl{font-family:var(--fh);font-weight:700;font-size:.8rem;color:var(--tx);margin-bottom:3px}
+.gs{font-size:.7rem;color:var(--mu);line-height:1.4}
+
+.prob{display:flex;gap:14px;align-items:flex-start;background:var(--sf) !important;border:1px solid var(--br);border-left:3px solid var(--dn);border-radius:var(--r);padding:16px 18px;margin-bottom:10px}
+.pn{font-family:var(--fh);font-weight:800;font-size:1.4rem;color:var(--dn);line-height:1;flex-shrink:0;width:28px}
+.prob h4{font-family:var(--fh);font-weight:700;font-size:.88rem;margin-bottom:3px}
+.prob p{font-size:.83rem;margin:0}
+
+.sis{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);overflow:hidden;margin-bottom:10px}
+.sh{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;background:var(--sf2) !important;border-bottom:1px solid var(--br);flex-wrap:wrap;gap:7px}
+.sh h3{font-family:var(--fh);font-weight:700;font-size:.9rem;margin:0}
+.sa{font-size:.63rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:rgba(0,212,170,.1);color:var(--ac);padding:3px 11px;border-radius:20px;flex-shrink:0}
+.sb{padding:14px 18px;display:flex;flex-direction:column;gap:8px}
+.sr{display:flex;gap:9px;font-size:.84rem}
+.srl{font-weight:600;color:var(--tx);min-width:78px;flex-shrink:0;font-size:.76rem}
+.srv{color:var(--mu);line-height:1.5}
+
+.prio{display:flex;gap:12px;align-items:flex-start;background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);padding:14px 16px;margin-bottom:9px}
+.pdot{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.pdr{background:var(--dn)}.pdy{background:var(--wn)}.pdg{background:var(--mu)}
+.prio h4{font-family:var(--fh);font-weight:700;font-size:.86rem;margin-bottom:2px}
+.prio p{font-size:.82rem;margin:0}
+
+.conc{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);padding:26px;position:relative;overflow:hidden;margin-bottom:20px}
+.conc::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,170,.07),transparent 70%)}
+.conc p{font-size:.9rem;color:var(--mu);position:relative;z-index:1}
+
+.stab{width:100%;border-collapse:collapse;background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);overflow:hidden;font-size:.86rem}
+.stab th{background:var(--sf2) !important;font-family:var(--fh);font-size:.64rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:10px 14px;text-align:left;color:var(--mu);border-bottom:1px solid var(--br)}
+.stab td{padding:12px 14px;border-bottom:1px solid var(--br);vertical-align:middle}
+.stab tr:last-child td{border-bottom:none}
+.sbw{display:flex;align-items:center;gap:9px}
+.sbar{flex:1;height:6px;background:var(--sf2);border-radius:3px;overflow:hidden}
+.sfill{height:100%;border-radius:3px;width:0;transition:width 1.3s ease}
+.sfr{background:var(--dn)}.sfy{background:var(--wn)}.sfg{background:var(--ac)}
+.snum{font-family:var(--fh);font-weight:800;font-size:.86rem;min-width:32px}
+
+.btn-wa{display:inline-flex;align-items:center;gap:9px;background:var(--ac);color:#0a0c10;font-family:var(--fh);font-weight:700;font-size:.9rem;padding:13px 28px;border-radius:50px;text-decoration:none;transition:transform .2s,box-shadow .2s}
+.btn-wa:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,212,170,.35)}
+
+.btn-share{display:inline-flex;align-items:center;gap:9px;background:transparent;color:var(--ac);border:1px solid rgba(0,212,170,.35);font-family:var(--fh);font-weight:700;font-size:.86rem;padding:11px 24px;border-radius:50px;text-decoration:none;transition:transform .2s,background .2s,box-shadow .2s;margin-top:12px}
+.btn-share:hover{background:rgba(0,212,170,.08);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,212,170,.15)}
+
+.share-box{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);padding:22px 24px;text-align:center;margin-top:24px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.share-box p{font-size:.82rem;color:var(--mu);margin:0 0 12px}
+
+.cta-mid{background:var(--sf) !important;border:1px solid var(--br);border-radius:var(--r);padding:28px;text-align:center;margin-top:24px}
+.cta-mid h3{font-family:var(--fh);font-weight:800;font-size:1.1rem;color:var(--tx);margin-bottom:8px}
+.cta-mid p{font-size:.86rem;color:var(--mu);margin-bottom:20px}
+
+.ftr{background:var(--sf) !important;border-top:1px solid var(--br);padding:40px 20px;text-align:center}
+.ftr h3{font-family:var(--fh);font-weight:800;font-size:1.2rem;color:var(--tx);margin-bottom:10px}
+.ftr p{font-size:.82rem;color:var(--mu);margin-bottom:24px}
+
+@media(max-width:640px){
+  .scores{grid-template-columns:1fr 1fr}
+  .charts-row{grid-template-columns:1fr}
+  .grow{grid-template-columns:1fr 1fr}
+  .ncg{grid-template-columns:1fr 1fr}
+  h1{font-size:1.9rem}
+  .rwrap{height:220px}
+}
+@media(max-width:400px){
+  .grow{grid-template-columns:1fr}
+  .ncg{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-in">
+    <div class="hdr-top">
+      <span class="logo">8 <span>Tentáculos</span></span>
+      <span class="hdr-date">Auditoría Inteligente · Julio 2025</span>
+    </div>
+    <div class="badge rv vis">📊 Informe de diagnóstico</div>
+    <h1 class="rv vis d1">Joshua — <em>Automatizaciones</em></h1>
+    <p class="hdr-sub rv vis d2">Agencia de automatización · Fase inicial · Equipo de 1 persona</p>
+    <div class="scores rv vis d3">
+      <div class="sc"><div class="sc-l">Captación</div><div class="sc-v cdn">3/10</div></div>
+      <div class="sc"><div class="sc-l">Conversión</div><div class="sc-v cwn">5/10</div></div>
+      <div class="sc"><div class="sc-l">Operaciones</div><div class="sc-v cwn">5/10</div></div>
+      <div class="sc"><div class="sc-l">Fugas críticas</div><div class="sc-v cdn">4</div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 01 RESUMEN -->
+<section class="sec">
+  <div class="wrap">
+    <p class="slbl rv">01 — Resumen del negocio</p>
+    <h2 class="rv d1">Quién es Joshua y en qué momento está</h2>
+    <div class="ncg rv d2">
+      <div class="nc"><div class="nc-l">Sector</div><div class="nc-v">Automatizaciones / IA</div></div>
+      <div class="nc"><div class="nc-l">Fase</div><div class="nc-v">Inicial — arrancando</div></div>
+      <div class="nc"><div class="nc-l">Equipo</div><div class="nc-v">1 persona</div></div>
+      <div class="nc"><div class="nc-l">Ticket medio</div><div class="nc-v">200–600€ impl. + recurrente</div></div>
+      <div class="nc"><div class="nc-l">Modelo</div><div class="nc-v">Implementación + suscripción mensual</div></div>
+      <div class="nc"><div class="nc-l">Canal principal</div><div class="nc-v">Instagram + WhatsApp</div></div>
+    </div>
+    <p class="rv d3">Joshua está construyendo una agencia de automatizaciones en fase muy temprana: tiene el producto, el proceso de venta (agenda + llamada) y la infraestructura base (CRM y alertas), pero <strong>el cuello de botella crítico es la captación</strong>: no hay leads entrando de forma sistemática. Con una inversión de 150–300€/mes y cero leads registrados, el negocio tiene todo el potencial del mundo pero no fluye dinero hacia él aún. El primer trabajo no es optimizar la conversión, es construir un sistema de generación de demanda predecible.</p>
+  </div>
+</section>
+
+
+<!-- 02 MÉTRICAS -->
+<section class="sec">
+  <div class="wrap">
+    <p class="slbl rv">02 — Métricas del embudo</p>
+    <h2 class="rv d1">Dónde está el dinero ahora y dónde podría estar</h2>
+    <div class="charts-row rv d2">
+      <div class="cbox">
+        <div class="cbox-t">Embudo actual — leads vs resultados</div>
+        <div class="cwrap"><canvas id="cFunnel"></canvas></div>
+      </div>
+      <div class="cbox">
+        <div class="cbox-t">Facturación nueva mensual — actual vs con sistemas</div>
+        <div class="cwrap"><canvas id="cRevenue"></canvas></div>
+      </div>
+    </div>
+    <table class="mt rv d3">
+      <thead><tr><th>Métrica</th><th>Situación actual</th><th>Con sistemas inteligentes</th></tr></thead>
+      <tbody>
+        <tr><td class="tdl">Inversión mensual captación</td><td class="tdc">150–300€</td><td class="tdi">150–300€ (misma inversión)</td></tr>
+        <tr><td class="tdl">Leads mensuales</td><td class="tdc">~0 (sin sistema activo)</td><td class="tdi">↑ 15–25 leads/mes estimados</td></tr>
+        <tr><td class="tdl">Ventas mensuales nuevas</td><td class="tdc">~0 clientes</td><td class="tdi">↑ 3–5 clientes/mes</td></tr>
+        <tr><td class="tdl">Coste por lead</td><td class="tdc">[DATO NO APORTADO]</td><td class="tdi">~15–20€ estimado</td></tr>
+        <tr><td class="tdl">Coste por venta</td><td class="tdc">[DATO NO APORTADO]</td><td class="tdi">~60–100€ estimado</td></tr>
+        <tr><td class="tdl">Tasa conversión lead→venta</td><td class="tdc">[DATO NO APORTADO]</td><td class="tdi">↑ 20–30% con pipeline activo</td></tr>
+        <tr><td class="tdl">Facturación nuevos clientes/mes</td><td class="tdc">~0€</td><td class="tdi">↑ 1.200–2.500€/mes</td></tr>
+      </tbody>
+    </table>
+    <div class="mnote rv d4">💡 <strong>El impacto real:</strong> Con un sistema de captación activo en Instagram + una VSL o sistema de citas automáticas, Joshua podría pasar de 0 a 15–25 leads/mes con la misma inversión. Si el proceso de agenda y llamada convierte al 20–30%, serían 3–5 clientes nuevos al mes, lo que representa entre 1.200€ y 2.500€ de facturación nueva mensual desde el primer mes operativo.</div>
+  </div>
+</section>
+
+
+<!-- 03 DIAGNÓSTICO -->
+<section class="sec">
+  <div class="wrap">
+    <p class="slbl rv">03 — Diagnóstico por áreas</p>
+    <h2 class="rv d1">Qué funciona, qué falla y dónde se escapa el dinero</h2>
+    <div class="rbox rv d2">
+      <div class="cbox-t">Mapa de salud del negocio — actual vs con sistemas 8T (puntuación /10)</div>
+      <div class="rwrap"><canvas id="cRadar"></canvas></div>
+    </div>
+    <div class="diag rv d1">
+      <div class="dh"><span class="dt">📣 Captación</span><span class="ds dsr">3 / 10</span></div>
+      <div class="db">
+        <div class="di"><span class="dii">✅</span><span class="dit"><strong>Canales identificados (Instagram + WhatsApp)</strong> Tiene claro dónde está su audiencia y cómo contactar, lo cual es una base sólida para escalar con sistemas.</span></div>
+        <div class="di"><span class="dii">❌</span><span class="dit"><strong>Sin flujo de leads activo</strong> No hay un sistema generando solicitudes de forma constante. Los leads llegan, si llegan, de forma orgánica y no predecible.</span></div>
+        <div class="di"><span class="dii">❌</span><span class="dit"><strong>Sin campañas de pago activas</strong> Con 150–300€/mes disponibles hay margen para generar tráfico cualificado, pero ese presupuesto no está siendo aprovechado estructuralmente.</span></div>
+        <div class="di"><span class="dii">🔴</span><span class="dit"><strong>Fuga crítica — Captación no sistematizada:</strong> Sin un sistema que convierta la inversión en leads predecibles, el negocio depende del alcance orgánico, que en fase inicial es insuficiente para sostener ventas regulares.</span></div>
+      </div>
+    </div>
+    <div class="diag rv d2">
+      <div class="dh"><span class="dt">🔁 Conversión y seguimiento</span><span class="ds dsy">5 / 10</span></div>
+      <div class="db">
+        <div class="di"><span class="dii">✅</span><span class="dit"><strong>CRM activo</strong> Ya tiene un CRM implementado, lo que significa que cuando entren leads habrá dónde gestionarlos y hacer seguimiento.</span></div>
+        <div class="di"><span class="dii">✅</span><span class="dit"><strong>Alertas configuradas</strong> Las alertas ya están activas, lo que reducirá la pérdida de oportunidades cuando el volumen de leads crezca.</span></div>
+        <div class="di"><span class="dii">❌</span><span class="dit"><strong>Sin visibilidad de métricas de conversión</strong> No hay datos actuales de tasa de respuesta, show-up de llamadas ni cierre, lo que impide saber dónde exactamente se pierden los leads.</span></div>
+        <div class="di"><span class="dii">🔴</span><span class="dit"><strong>Fuga crítica — No-shows en llamadas:</strong> El propio Joshua señala las llamadas como un error frecuente. Sin un sistema de recordatorios y confirmación automática, el no-show puede superar el 40–50% en fase inicial.</span></div>
+        <div class="di"><span class="dii">🔴</span><span class="dit"><strong>Fuga crítica — Follow-up manual:</strong> El seguimiento post-primer contacto lo hace Joshua manualmente. Esto limita la capacidad de atender varios prospectos a la vez y genera inconsistencia en los tiempos de respuesta.</span></div>
+      </div>
+    </div>
+    <div class="diag rv d3">
+      <div class="dh"><span class="dt">⚙️ Operaciones internas</span><span class="ds dsy">5 / 10</span></div>
+      <div class="db">
+        <div class="di"><span class="dii">✅</span><span class="dit"><strong>Respuesta automática activada</strong> Tiene algún tipo de respuesta automática configurada, lo que evita que los leads queden sin atención inmediata.</span></div>
+        <div class="di"><span class="dii">❌</span><span class="dit"><strong>Contacto con clientes aún manual</strong> El proceso de contactar y nutrir a prospectos y clientes existentes consume tiempo de Joshua, que en solitario es un recurso muy limitado.</span></div>
+        <div class="di"><span class="dii">❌</span><span class="dit"><strong>Supervisión como tarea recurrente</strong> Joshua quiere eliminar la supervisión de procesos, pero sin automatización esto seguirá siendo una carga operativa diaria que le impide centrarse en captar y cerrar.</span></div>
+        <div class="di"><span class="dii">🔴</span><span class="dit"><strong>Fuga crítica — Tiempo como único recurso:</strong> Al ser un equipo de 1, cada tarea manual (contactar, supervisar, facturar con asesor) compite directamente con el tiempo de venta y entrega. Sin sistemas, el crecimiento tiene techo inmediato.</span></div>
+      </div>
+    </div>
+    <div class="share-box rv d3">
+      <p>¿Conoces a alguien que necesite saber cómo está su negocio?</p>
+      <a href="https://wa.me/?text=Realiza%20auditoria%20de%20tu%20negocio%20con%20ia%20avanzada%20aqu%C3%AD%20gratis%3A%20https%3A%2F%2F8tentaculos.com%2Fauditoria-inteligente-a" class="btn-share" target="_blank" rel="noopener">📤 Envía a un amigo su auditoría gratis</a>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <p class="slbl rv">04 — Problemas principales</p>
+    <h2 class="rv d1">Los 5 frenos ordenados por impacto económico</h2>
+    <div class="cbox rv d2" style="margin-bottom:18px">
+      <div class="cbox-t">Clientes potenciales perdidos al mes por cada problema</div>
+      <div class="cwrap"><canvas id="cProblems"></canvas></div>
+    </div>
+    <div class="prob rv d1"><span class="pn">01</span><div><h4>Sin sistema de captación activo — el negocio no genera demanda</h4><p>Sin leads entrando de forma predecible no hay embudo que optimizar. Este es el problema número uno: no existe un mecanismo que lleve prospectos cualificados al proceso de venta de forma constante con los 150–300€ disponibles.</p></div></div>
+    <div class="prob rv d2"><span class="pn">02</span><div><h4>No-shows en llamadas de venta sin sistema de confirmación</h4><p>Las llamadas son el punto de cierre del negocio, y sin recordatorios automáticos ni confirmación de asistencia, una parte significativa de las citas reservadas no se presenta. Cada no-show es un potencial cliente perdido y tiempo de Joshua desperdiciado.</p></div></div>
+    <div class="prob rv d3"><span class="pn">03</span><div><h4>Follow-up manual que no escala ni es consistente</h4><p>El seguimiento a prospectos que no cierran en la primera llamada depende de que Joshua lo recuerde y tenga tiempo. Sin un pipeline automatizado, el 60–70% de leads que dicen "me lo pienso" no reciben seguimiento suficiente y se enfrían.</p></div></div>
+    <div class="prob rv d1"><span class="pn">04</span><div><h4>Sin métricas de embudo — decisiones a ciegas</h4><p>No hay visibilidad sobre cuántos leads entran, cuántos responden, cuántos reservan llamada y cuántos cierran. Sin estos datos es imposible saber qué mejorar ni demostrar el valor del propio trabajo a potenciales clientes.</p></div></div>
+    <div class="prob rv d2"><span class="pn">05</span><div><h4>Operaciones manuales que consumen tiempo de venta</h4><p>Contactar clientes, supervisar procesos y gestionar facturas con asesor externo son tareas que en un negocio unipersonal compiten directamente con las horas dedicadas a captar y cerrar. Cada hora operativa es una hora menos de crecimiento.</p></div></div>
+
+    <div class="cta-mid rv d3">
+      <h3>¿Quieres instalar estos sistemas en tu negocio?</h3>
+      <p>Agenda una sesión 1 a 1 con el equipo y te explicamos exactamente cómo hacerlo, qué necesitas y en cuánto tiempo verías resultados.</p>
+      <a href="https://wa.me/34722137710?text=Agendar%20sesion%201%20a%201" class="btn-wa" target="_blank" rel="noopener">💬 Agendar sesión 1 a 1</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- 05 SISTEMAS -->
+<section class="sec">
+  <div class="wrap">
+    <p class="slbl rv">05 — Sistemas recomendados</p>
+    <h2 class="rv d1">Qué instalar y qué impacto esperar</h2>
+    <div class="grow rv d2">
+      <div class="gb"><div class="gwrap"><canvas id="g1"></canvas></div><div class="gl">Captación activa</div><div class="gs">Situación actual sobre potencial con sistemas</div></div>
+      <div class="gb"><div class="gwrap"><canvas id="g2"></canvas></div><div class="gl">Show-up llamadas</div><div class="gs">Tasa actual estimada vs posible con confirmación automática</div></div>
+      <div class="gb"><div class="gwrap"><canvas id="g3"></canvas></div><div class="gl">Eficiencia operativa</div><div class="gs">Tiempo en tareas de valor vs operativas manuales</div></div>
+    </div>
+
+    <div class="sis rv d1">
+      <div class="sh"><h3>Sistema de citas automáticas</h3><span class="sa">Captación</span></div>
+      <div class="sb">
+        <div class="sr"><span class="srl">Por qué:</span><span class="srv">Joshua tiene el proceso de agenda + llamada pero no hay un sistema que lleve prospectos a reservar cita de forma autónoma desde Instagram o WhatsApp.</span></div>
+        <div class="sr"><span class="srl">Qué resuelve:</span><span class="srv">Automatiza todo el flujo desde el primer mensaje hasta la cita reservada: calificación, propuesta de horario, confirmación y recordatorio. Sin intervención manual.</span></div>
+        <div class="sr"><span class="srl">Impacto:</span><span class="srv">Con 150–300€/mes en tráfico y un sistema de citas activo, estimamos 15–25 citas/mes. A una tasa de cierre del 20–25%, eso son 3–5 clientes nuevos al mes desde el arranque.</span></div>
+      </div>
+    </div>
+
+    <div class="sis rv d2">
+      <div class="sh"><h3>Venta VSL con respuesta inteligente</h3><span class="sa">Captación</span></div>
+      <div class="sb">
+        <div class="sr"><span class="srl">Por qué:</span><span class="srv">Instagram necesita un activo de conversión que explique la propuesta de valor de Joshua y precalifique al prospecto antes de la llamada, reduciendo el tiempo en llamadas no cualificadas.</span></div>
+        <div class="sr"><span class="srl">Qué resuelve:</span><span class="srv">Una VSL + flujo de respuesta inteligente filtra a los interesados, educa sobre el servicio y solo deriva a llamada a quienes tienen intención real de compra.</span></div>
+        <div class="sr"><span class="srl">Impacto:</span><span class="srv">Mejora la tasa de cierre en llamada al llegar el prospecto más informado y comprometido. Estimamos un aumento del 15–25% en la tasa de conversión llamada→venta.</span></div>
+      </div>
+    </div>
+
+    <div class="sis rv d3">
+      <div class="sh"><h3>Pipeline automatizado</h3><span class="sa">Conversión y seguimiento</span></div>
+      <div class="sb">
+        <div class="sr"><span class="srl">Por qué:</span><span class="srv">El follow-up manual de Joshua no puede escalar ni ser consistente. Un pipeline automatizado mueve a cada prospecto por las etapas correctas con los mensajes adecuados en el momento justo.</span></div>
+        <div class="sr"><span class="srl">Qué resuelve:</span><span class="srv">Automatiza secuencias de seguimiento post-llamada, recordatorios de pago, onboarding inicial y recuperación de leads fríos. Joshua deja de perseguir manualmente.</span></div>
+        <div class="sr"><span class="srl">Impacto:</span><span class="srv">Recupera el 20–30% de leads que dicen "me lo pienso". Con 15 leads/mes, eso son 3–5 clientes adicionales recuperados que con follow-up manual se perderían.</span></div>
+      </div>
+    </div>
+
+    <div class="sis rv d1">
+      <div class="sh"><h3>Sistema de control de métricas</h3><span class="sa">Conversión y seguimiento</span></div>
+      <div class="sb">
+        <div class="sr"><span class="srl">Por qué:</span><span class="srv">Sin datos no hay mejora posible. Joshua necesita saber en tiempo real cuántos leads entran, cuántos convierten y dónde se rompe el embudo para tomar decisiones correctas.</span></div>
+        <div class="sr"><span class="srl">Qué resuelve:</span><span class="srv">Dashboard automático con KPIs clave: leads/mes, tasa de respuesta, show-up en llamadas, tasa de cierre y facturación nueva. Actualizado en tiempo real sin trabajo manual.</span></div>
+        <div class="sr"><span class="srl">Impacto:</span><span class="srv">Permite optimizar la inversión en captación con datos reales. En negocios en fase inicial, tener métricas claras acelera el aprendizaje y la mejora 3–4 veces más rápido que operar a ciegas.</span></div>
+      </div>
+    </div>
+
+    <div class="sis rv d2">
+      <div class="sh"><h3>Sistema de atención al cliente por WhatsApp</h3><span class="sa">Operaciones internas</span></div>
+      <div class="sb">
+        <div class="sr"><span class="srl">Por qué:</span><span class="srv">Joshua ya usa WhatsApp como canal principal pero el contacto con clientes es manual. Un sistema inteligente de atención responde, gestiona dudas y escala solo lo que requiere intervención humana.</span></div>
+        <div class="sr"><span class="srl">Qué resuelve:</span><span class="srv">Automatiza respuestas a preguntas frecuentes, confirmaciones de servicio, actualizaciones de proyecto y soporte básico. Libera horas diarias que Joshua puede dedicar a vender y entregar.</span></div>
+        <div class="sr"><span class="srl">Impacto:</span><span class="srv">Ahorro estimado de 6–10 horas/mes en gestión de comunicaciones. En un negocio unipersonal, eso es el equivalente a 1–2 clientes adicionales que se pueden atender sin aumentar el esfuerzo.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- 06 PRIORIDAD -->
+<section class="sec">
+  <div class="wrap">
+    <p class="slbl rv">06 — Orden de implementación</p>
+    <h2 class="rv d1">Qué instalar primero y por qué</h2>
+    <div class="prio rv d1"><div class="pdot pdr"></div><div><h4>Ahora — Sistema de citas automáticas</h4><p>Es la palanca de mayor impacto inmediato. Sin leads entrando nada más funciona. Este sistema convierte la inversión en tráfico en citas reales sin depender del tiempo de Joshua para calificar y agendar manualmente.</p></div></div>
+    <div class="prio rv d2"><div class="pdot pdr"></div><div><h4>Ahora — Venta VSL con respuesta inteligente</h4><p>Se despliega junto al sistema de citas para precalificar a los prospectos antes de la llamada. Mejora la calidad de las citas y la tasa de cierre desde el primer día de captación activa.</p></div></div>
+    <div class="prio rv d3"><div class="pdot pdy"></div><div><h4>Mes 2 — Pipeline automatizado + Sistema de control de métricas</h4><p>Una vez hay flujo de leads, el pipeline automatiza el seguimiento y evita que los interesados se enfríen. Las métricas permiten optimizar cada variable del embudo con datos reales por primera vez.</p></div></div>
+    <div class="prio rv d1"><div class="pdot pdg"></div><div><h4>Mes 3 — Sistema de atención al cliente por WhatsApp</h4><p>Con clientes recurrentes activos, automatizar la comunicación de soporte y seguimiento libera tiempo para escalar la captación y la entrega sin contratar personal adicional.</p></div></div>
+  </div>
+</section>
+
+
+<!-- 07 CONCLUSIÓN -->
+<section class="sec">
+  <div class="wrap">
+    <p class="slbl rv">07 — Conclusión estratégica</p>
+    <h2 class="rv d1">El diagnóstico en claro</h2>
+    <div class="conc rv d2">
+      <p>Joshua tiene algo muy valioso: vende automatizaciones, lo que significa que entiende el valor de los sistemas mejor que la mayoría de sus futuros clientes. La infraestructura base está bien planteada (CRM, alertas, proceso de venta definido), pero <strong>el negocio está en pausa porque no hay un motor de captación activo</strong>. Con cero leads, el mejor proceso de ventas del mundo no convierte nada.</p>
+      <p style="margin-top:12px">La prioridad absoluta es instalar un sistema de citas automáticas + VSL en Instagram que convierta la inversión actual (150–300€/mes) en 15–25 citas calificadas. En 30–45 días desde el arranque del sistema, Joshua debería ver los primeros 3–5 cierres mensuales, generando entre 1.200€ y 2.500€ de facturación nueva de forma predecible y recurrente.</p>
+    </div>
+    <table class="stab rv d3">
+      <thead><tr><th>Área</th><th>Puntuación actual</th><th>Diagnóstico</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Captación</strong></td>
+          <td><div class="sbw"><div class="sbar"><div class="sfill sfr" data-w="30%"></div></div><span class="snum cdn">3/10</span></div></td>
+          <td style="color:var(--mu);font-size:.8rem">Sin flujo de leads activo. Inversión sin convertir. Prioridad máxima.</td>
+        </tr>
+        <tr>
+          <td><strong>Conversión</strong></td>
+          <td><div class="sbw"><div class="sbar"><div class="sfill sfy" data-w="50%"></div></div><span class="snum cwn">5/10</span></div></td>
+          <td style="color:var(--mu);font-size:.8rem">CRM y alertas activos. Falla el no-show en llamadas y el follow-up manual.</td>
+        </tr>
+        <tr>
+          <td><strong>Operaciones</strong></td>
+          <td><div class="sbw"><div class="sbar"><div class="sfill sfy" data-w="50%"></div></div><span class="snum cwn">5/10</span></div></td>
+          <td style="color:var(--mu);font-size:.8rem">Respuesta automática activa. Tareas manuales consumen tiempo de venta clave.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- FOOTER -->
+<div class="ftr">
+  <h3>¿Listo para convertir tu negocio en un negocio inteligente?</h3>
+  <p>Agenda una sesión 1 a 1 con el equipo y te contamos exactamente cómo instalamos los sistemas, qué necesitas y en cuánto tiempo verías resultados.</p>
+  <a href="https://wa.me/34722137710?text=Agendar%20sesion%201%20a%201" class="btn-wa" target="_blank" rel="noopener">💬 Agendar sesión 1 a 1</a>
+  <p style="margin-top:20px;font-size:.72rem">© 2025 Neurosense S.L. · 8tentaculos.com · Auditoría Inteligente</p>
+</div>
+
+
+<script>
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')}),{threshold:.08});
+document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+
+const sbObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('.sfill').forEach(b=>{setTimeout(()=>{b.style.width=b.getAttribute('data-w')},200)});sbObs.unobserve(e.target)}})},{threshold:.3});
+const st=document.querySelector('.stab');if(st)sbObs.observe(st);
+
+Chart.defaults.color='#8892a4';
+Chart.defaults.font.family="'DM Sans',sans-serif";
+const A='#00d4aa',A2='#0098ff',D='#ff4b6e',W='#ffb400',S2='#161b25',BR='rgba(255,255,255,0.07)';
+
+new Chart(document.getElementById('cFunnel'),{
+  type:'bar',
+  data:{
+    labels:['Leads/mes','Responden','Reservan','Cierran venta'],
+    datasets:[{
+      data:[0,0,0,0],
+      backgroundColor:['rgba(0,152,255,.4)','rgba(0,152,255,.3)','rgba(255,180,0,.4)','rgba(255,75,110,.5)'],
+      borderColor:[A2,A2,W,D],borderWidth:1,borderRadius:6
+    },{
+      label:'Con sistemas',
+      data:[20,14,8,4],
+      backgroundColor:['rgba(0,212,170,.25)','rgba(0,212,170,.2)','rgba(0,212,170,.15)','rgba(0,212,170,.35)'],
+      borderColor:[A,A,A,A],borderWidth:1,borderRadius:6
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{boxWidth:10,font:{size:10}}}},
+    scales:{x:{grid:{color:BR},ticks:{font:{size:10}}},y:{grid:{color:BR},beginAtZero:true}}}
+});
+
+new Chart(document.getElementById('cRevenue'),{
+  type:'bar',
+  data:{
+    labels:['Actual','Con sistemas'],
+    datasets:[{
+      data:[0,1800],
+      backgroundColor:['rgba(255,75,110,.35)','rgba(0,212,170,.4)'],
+      borderColor:[D,A],borderWidth:1,borderRadius:8
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{grid:{color:BR}},y:{grid:{color:BR},beginAtZero:true,ticks:{callback:v=>v+'€'}}}}
+});
+
+new Chart(document.getElementById('cRadar'),{
+  type:'radar',
+  data:{
+    labels:['Captación','Respuesta leads','Seguimiento','CRM/Pipeline','Operaciones','Métricas'],
+    datasets:[
+      {label:'Situación actual',data:[2,5,3,6,4,2],
+       backgroundColor:'rgba(255,75,110,.1)',borderColor:D,borderWidth:2,pointBackgroundColor:D,pointRadius:4},
+      {label:'Con sistemas 8T',data:[8,9,8,9,8,8],
+       backgroundColor:'rgba(0,212,170,.08)',borderColor:A,borderWidth:2,pointBackgroundColor:A,pointRadius:4}
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{boxWidth:11,padding:14,font:{size:11}}}},
+    scales:{r:{min:0,max:10,grid:{color:BR},angleLines:{color:BR},
+      pointLabels:{font:{size:11},color:'#8892a4'},ticks:{display:false}}}}
+});
+
+new Chart(document.getElementById('cProblems'),{
+  type:'bar',
+  data:{
+    labels:['Sin captación activa','No-shows en llamadas','Follow-up manual','Sin métricas','Ops manuales'],
+    datasets:[{
+      data:[5,3,3,2,2],
+      backgroundColor:['rgba(255,75,110,.55)','rgba(255,75,110,.45)','rgba(255,180,0,.5)','rgba(255,180,0,.4)','rgba(136,146,164,.3)'],
+      borderColor:[D,D,W,W,'#8892a4'],borderWidth:1,borderRadius:6
+    }]
+  },
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.raw} clientes potenciales perdidos`}}},
+    scales:{x:{grid:{color:BR},beginAtZero:true,title:{display:true,text:'Clientes perdidos/mes',color:'#8892a4',font:{size:10}}},y:{grid:{color:BR},ticks:{font:{size:11}}}}}
+});
+
+function gauge(id,val,max,color){
+  new Chart(document.getElementById(id),{
+    type:'doughnut',
+    data:{datasets:[{data:[val,max-val],backgroundColor:[color,S2],borderWidth:0,borderRadius:3}]},
+    plugins:[{id:'ct',beforeDraw(c){
+      const{ctx,chartArea:{top,bottom,left,right}}=c;
+      const cx=(left+right)/2,cy=(top+bottom)/2;
+      ctx.save();ctx.font="800 15px 'Bricolage Grotesque',sans-serif";
+      ctx.fillStyle='#f0f2f7';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(Math.round((val/max)*100)+'%',cx,cy);ctx.restore();
+    }}],
+    options:{responsive:true,maintainAspectRatio:false,cutout:'70%',
+      plugins:{legend:{display:false},tooltip:{enabled:false}}}
+  });
+}
+gauge('g1',1,10,D);
+gauge('g2',4,10,W);
+gauge('g3',4,10,A2);
+</script>
+</body>
+</html>
