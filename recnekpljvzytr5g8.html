@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tu resultado · Kalma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5F1EA;
+    --bg-soft: #EDE6DA;
+    --bg-card: #FAF7F1;
+    --ink: #2B2620;
+    --ink-soft: #5C544A;
+    --ink-mute: #8A8175;
+    --line: #D9CFC0;
+    --accent: #8B7355;
+    --accent-deep: #5C4A38;
+    --warm: #B8956A;
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse at top left, rgba(139, 115, 85, 0.04), transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(184, 149, 106, 0.05), transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  header { padding: 56px 0 32px; text-align: center; }
+
+  .logo {
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  .logo-mark {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin: 0 6px;
+    vertical-align: middle;
+    transform: translateY(-4px);
+  }
+
+  .hero { text-align: center; padding: 80px 0 100px; }
+
+  .hero-eyebrow {
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 32px;
+    font-weight: 500;
+  }
+
+  .hero-name {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 22px;
+    color: var(--ink-soft);
+    margin-bottom: 20px;
+  }
+
+  .hero-title {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(38px, 6vw, 58px);
+    line-height: 1.15;
+    color: var(--ink);
+    margin-bottom: 32px;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-title em { font-style: italic; color: var(--accent-deep); }
+
+  .hero-sub {
+    font-size: 17px;
+    color: var(--ink-soft);
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  .divider { width: 1px; height: 80px; background: var(--line); margin: 0 auto; }
+
+  section { padding: 80px 0; position: relative; }
+
+  .section-tag {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .section-title {
+    font-family: var(--serif);
+    font-size: clamp(32px, 5vw, 44px);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 40px;
+    letter-spacing: -0.02em;
+  }
+
+  .score-block { text-align: center; }
+
+  .score-number {
+    font-family: var(--serif);
+    font-size: clamp(120px, 18vw, 180px);
+    font-weight: 300;
+    line-height: 1;
+    color: var(--ink);
+    letter-spacing: -0.04em;
+    margin: 24px 0 8px;
+  }
+
+  .score-total {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 22px;
+    color: var(--ink-mute);
+    margin-bottom: 40px;
+  }
+
+  .baremo-card {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 40px 48px;
+    margin-top: 40px;
+    text-align: left;
+  }
+
+  .baremo-range {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 15px;
+    color: var(--accent);
+    margin-bottom: 12px;
+    letter-spacing: 0.02em;
+  }
+
+  .baremo-text { font-size: 17px; color: var(--ink-soft); line-height: 1.75; }
+
+  .dimensions-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 48px;
+  }
+
+  .dim-row {
+    display: grid;
+    grid-template-columns: 220px 1fr 40px;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .dim-name { font-size: 14px; color: var(--ink-soft); font-weight: 500; }
+
+  .dim-bar-bg {
+    height: 6px;
+    background: var(--bg-soft);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .dim-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .dim-bar-fill.strong { background: var(--accent-deep); }
+  .dim-bar-fill.weak { background: var(--warm); }
+
+  .dim-score {
+    font-family: var(--serif);
+    font-size: 16px;
+    color: var(--ink);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .strong-block {
+    background: var(--bg-card);
+    border-radius: 4px;
+    padding: 64px 56px;
+    border-left: 2px solid var(--accent);
+  }
+
+  .perfil-label {
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+
+  .perfil-name {
+    font-family: var(--serif);
+    font-size: 36px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .perfil-dim {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 17px;
+    color: var(--accent);
+    margin-bottom: 32px;
+  }
+
+  .perfil-resumen { font-size: 17px; color: var(--ink-soft); line-height: 1.8; }
+  .perfil-resumen p + p { margin-top: 16px; }
+
+  .palanca-section { padding: 120px 0; }
+  .palanca-intro { text-align: center; margin-bottom: 64px; }
+
+  .palanca-header {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 80px 56px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .palanca-header .perfil-label { color: rgba(245, 241, 234, 0.6); }
+  .palanca-header .perfil-name { color: var(--bg); font-size: 48px; margin-bottom: 12px; }
+  .palanca-header .perfil-dim { color: var(--warm); }
+
+  .palanca-content { background: var(--bg-card); padding: 0; border-radius: 4px; }
+  .palanca-block { padding: 56px; border-bottom: 1px solid var(--line); }
+  .palanca-block:last-child { border-bottom: none; }
+
+  .block-eyebrow {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+    color: var(--accent);
+    margin-bottom: 12px;
+    letter-spacing: 0.02em;
+  }
+
+  .block-title {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 24px;
+    letter-spacing: -0.01em;
+  }
+
+  .block-content { font-size: 17px; color: var(--ink-soft); line-height: 1.85; }
+  .block-content p + p { margin-top: 20px; }
+  .block-content strong { color: var(--ink); font-weight: 500; }
+
+  .closing { text-align: center; padding: 120px 0 100px; }
+
+  .closing-quote {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(22px, 3vw, 28px);
+    color: var(--ink);
+    line-height: 1.5;
+    max-width: 560px;
+    margin: 0 auto 48px;
+    letter-spacing: -0.01em;
+  }
+
+  footer {
+    padding: 48px 0;
+    text-align: center;
+    border-top: 1px solid var(--line);
+    margin-top: 40px;
+  }
+
+  .footer-text { font-size: 13px; color: var(--ink-mute); letter-spacing: 0.05em; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in { animation: fadeUp 1s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.25s; }
+  .delay-3 { animation-delay: 0.4s; }
+  .delay-4 { animation-delay: 0.55s; }
+
+  @media (max-width: 720px) {
+    .container { padding: 0 24px; }
+    section { padding: 60px 0; }
+    .baremo-card { padding: 32px 28px; }
+    .strong-block { padding: 40px 32px; }
+    .palanca-header { padding: 56px 32px; }
+    .palanca-header .perfil-name { font-size: 36px; }
+    .palanca-block { padding: 40px 32px; }
+    .block-title { font-size: 24px; }
+    .dim-row { grid-template-columns: 1fr; gap: 8px; }
+    .dim-score { text-align: left; font-size: 14px; color: var(--ink-mute); }
+    .dim-bar-bg { grid-row: 2; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="logo">kalma<span class="logo-mark"></span></div>
+  </div>
+</header>
+
+<div class="hero container">
+  <div class="hero-eyebrow fade-in delay-1">Tu test del sistema nervioso</div>
+  <div class="hero-name fade-in delay-2">Hola, Virginia </div>
+  <h1 class="hero-title fade-in delay-3">Este es el estado de tu <em>sistema nervioso</em> hoy.</h1>
+  <p class="hero-sub fade-in delay-4">No es una nota. No es un juicio. Es una foto del momento. Tu cuerpo te ha contado dónde está. Vamos a leerlo juntos.</p>
+</div>
+
+<div class="divider"></div>
+
+<section>
+  <div class="container score-block">
+    <span class="section-tag">— Bloque uno</span>
+    <h2 class="section-title">Tu puntuación global</h2>
+    <div class="score-number">23</div>
+    <div class="score-total">de 48</div>
+    <div class="baremo-card">
+      <div class="baremo-range">16–30 puntos · Zonas que funcionan, zonas que cuestan</div>
+      <p class="baremo-text">Tu sistema nervioso tiene zonas que funcionan bien y otras que te están costando. Es lo más común. La mayoría de personas están aquí. Lo importante es saber cuáles son unas y cuáles son otras.</p>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top: 0;">
+  <div class="container">
+    <span class="section-tag">— Cómo está cada área</span>
+    <h2 class="section-title">Tus 8 dimensiones</h2>
+    <div class="dimensions-grid">
+      <div class="dim-row">
+        <div class="dim-name">Sueño y descanso</div>
+        <div class="dim-bar-bg"><div class="dim-bar-fill " style="width: 50%"></div></div>
+        <div class="dim-score">3/6</div>
+      </div>
+      <div class="dim-row">
+        <div class="dim-name">Estimulación digital</div>
+        <div class="dim-bar-bg"><div class="dim-bar-fill " style="width: 50%"></div></div>
+        <div class="dim-score">3/6</div>
+      </div>
+      <div class="dim-row">
+        <div class="dim-name">Ritmo y pausas</div>
+        <div class="dim-bar-bg"><div class="dim-bar-fill " style="width: 67%"></div></div>
+        <div class="dim-score">4/6</div>
+      </div>
+      <div class="dim-row">
+        <div class="dim-name">Carga corporal</div>
+        <div class="dim-bar-bg"><div class="dim-bar-fill " style="width: 33%"></div></div>
+        <div class="dim-score">2/6</div>
+      </div>
+      <div class="dim-row">
+        <div class="dim-name">Foco mental y atención</div>
+        <div class="dim-bar-bg"><div class="dim-bar-fill " style="width: 67%"></div></div>
+        <div class="dim-score">4/6</div>
+      </div>
+      <div class="dim-row">
+        <div class="dim-name">Diálogo interno</div>
+        <div class="dim-bar-bg"><div class="dim-bar-fill " style="width: 17%"></div></div>
+        <div class="dim-score">1/6</div>
+      </div>
+      <div class="dim-row">
+        <div class="dim-name">Conexión social real</div>
+        <div class="dim-bar-bg"><div class="dim-bar-fill strong" style="width: 100%"></div></div>
+        <div class="dim-score">6/6</div>
+      </div>
+      <div class="dim-row">
+        <div class="dim-name">Autorregulación</div>
+        <div class="dim-bar-bg"><div class="dim-bar-fill weak" style="width: 0%"></div></div>
+        <div class="dim-score">0/6</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <span class="section-tag">— Bloque dos</span>
+    <h2 class="section-title">Tu zona fuerte</h2>
+    <div class="strong-block">
+      <div class="perfil-label">Donde tu cuerpo ya sabe</div>
+      <div class="perfil-name">Vínculo real</div>
+      <div class="perfil-dim">D7 — Conexión social real · 6/6</div>
+      <div class="perfil-resumen">
+        <p>Esta es el área donde más síes has marcado. Donde tu cuerpo ya tiene hábitos que funcionan, aunque no los hayas pensado conscientemente.</p>
+        <p>En base a tus respuestas, la conexión social es una de las áreas donde tu cuerpo ya sabe. Tienes conversaciones significativas. Pides ayuda cuando la necesitas. Estás con personas que te hacen sentir en calma. Y cuando estás con alguien, estás presente de verdad.</p>
+<p>Esto no es solo emocional, es químico. La conexión real libera oxitocina, una hormona que amortigua directamente el cortisol y activa el sistema parasimpático. Por eso te sientes diferente después de una buena conversación. Tu sistema nervioso se está regulando a través del vínculo con otros. Estás usando un recurso que el cuerpo humano lleva miles de años usando.</p>
+<p>En los días en los que sientas que nada funciona, llama a alguien. Quédate con alguien. No te aísles cuando estés mal: ese es justo el momento en el que tu zona fuerte más te va a sostener.</p>
+        <p>Cuídala. En los días en los que sientas que nada funciona, esta es tu ancla. Vuelve aquí.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="palanca-section">
+  <div class="container">
+    <div class="palanca-intro">
+      <span class="section-tag">— Bloque tres</span>
+      <h2 class="section-title">Tu zona palanca</h2>
+      <p class="hero-sub">Si mueves esto, mueves todo lo demás. No es tu problema. Es donde un pequeño cambio te va a traer el mayor regalo.</p>
+    </div>
+    <div class="palanca-header">
+      <div class="perfil-label">Tu punto de palanca</div>
+      <div class="perfil-name">Sin protocolo</div>
+      <div class="perfil-dim">D8 — Autorregulación · 0/6</div>
+    </div>
+    <div class="palanca-content">
+      <div class="palanca-block">
+        <div class="block-eyebrow">— Qué significa esto</div>
+        <h3 class="block-title">Lo que tu test refleja</h3>
+        <div class="block-content"><p>En base a tus respuestas, el área donde más fricción has marcado es la autorregulación.</p>
+<p>Esto no significa que sea tu único problema. Pero indica que cuando algo te activa, no tienes un sistema claro para volver a ti. Improvisas desde el modo reactivo.</p></div>
+      </div>
+      <div class="palanca-block">
+        <div class="block-eyebrow">— Por qué importa</div>
+        <h3 class="block-title">La ciencia detrás</h3>
+        <div class="block-content"><p>Cuando algo te activa (un comentario, una situación, un pensamiento), tu sistema nervioso entra en modo alerta. La amígdala se enciende, el cortisol sube, el cuerpo se prepara para la acción.</p>
+<p>Si no tienes un protocolo para bajar esa activación, el cuerpo se queda ahí. A veces durante minutos. A veces durante horas. Y reaccionas desde ese estado: con más intensidad de la necesaria, con menos claridad de la que te gustaría.</p>
+<p>Tener un protocolo no es ser frío ni controlar todo. Es tener una herramienta que puedes usar cuando la necesitas. Algo que tu cuerpo ya conoce y que sabe que funciona. Así, cuando venga la activación, no tienes que inventar nada. Solo aplicar lo que ya sabes.</p></div>
+      </div>
+      <div class="palanca-block">
+        <div class="block-eyebrow">— Tu experimento</div>
+        <h3 class="block-title">Esta semana, prueba esto</h3>
+        <div class="block-content"><p>Esta semana, elige una herramienta simple y úsala una vez al día. Aunque no estés activado/a.</p>
+<p>La que mejor funciona es la <strong>respiración 4-7-8</strong>:</p>
+<p>· Inhala por la nariz contando 4 segundos<br>
+· Aguanta el aire contando 7 segundos<br>
+· Exhala por la boca contando 8 segundos</p>
+<p>Hazlo 3-4 veces seguidas. Tarda menos de 2 minutos.</p>
+<p>Úsala cada día, aunque estés bien. Porque el objetivo no es usarla solo cuando la necesitas. El objetivo es que tu cuerpo la conozca tan bien que, cuando venga la activación, sea automático recurrir a ella.</p>
+<p>Y cuando notes que algo te activa esta semana, antes de reaccionar, para un segundo. Siente dónde está la activación en tu cuerpo. Y aplica tu herramienta. Aunque sea incómodo. Aunque la mente diga que no hay tiempo.</p>
+<p>Quizás el primer día sientes incomodidad, SIÉNTELO, es tu cuerpo regulándose. En breve, se adaptará y las sensaciones serán diferentes, experimenta.</p>
+<p>No lo haces porque sea lo correcto. No lo haces porque te lo diga Kalma. Lo haces porque te da la gana tener un sistema para volver a ti cuando la vida te active. Tú decides.</p>
+<p>Y te lo mereces. Regálatelo.</p></div>
+      </div>
+      <div class="palanca-block">
+        <div class="block-eyebrow">— Qué pasa cuando lo haces</div>
+        <h3 class="block-title">Lo que ocurre dentro</h3>
+        <div class="block-content"><p>La respiración 4-7-8 funciona porque la exhalación larga activa el nervio vago y el sistema parasimpático. El ritmo cardíaco baja. El cortisol deja de subir. El cuerpo recibe la señal de que el peligro ha pasado.</p>
+<p>Y cuando lo haces cada día, aunque no haya activación, estás entrenando a tu sistema nervioso a volver a la calma. Estás creando un camino neuronal que cada vez es más fácil de activar.</p>
+<p>No es control. Es entrenamiento. Y con el tiempo, la diferencia entre reaccionar y responder se hace enorme.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="closing">
+  <div class="container">
+    <p class="closing-quote">"Calmar el sistema nervioso no es hacer más. Es darle al cuerpo permiso para volver a sí mismo."</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p class="footer-text">KALMA · Conecta contigo</p>
+  </div>
+</footer>
+
+<script>
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.dim-bar-fill').forEach((bar, i) => {
+      const w = bar.style.width;
+      bar.style.width = '0%';
+      setTimeout(() => { bar.style.width = w; }, 100 + i * 80);
+    });
+  });
+</script>
+
+</body>
+</html>
